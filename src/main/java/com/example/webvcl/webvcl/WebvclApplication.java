@@ -8,7 +8,6 @@ public class WebvclApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(WebvclApplication.class, args);
-
     }
 
 }
