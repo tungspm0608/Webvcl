@@ -23,13 +23,13 @@ public class ChiTietSanPhamController {
     public String list(Model model) {
         List<ChiTietSanPham> list = entityManager.createQuery("SELECT c FROM ChiTietSanPham c", ChiTietSanPham.class).getResultList();
         model.addAttribute("chitietsanpham", list);
-        return "index";
+        return "./view/CTSP/index";
     }
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("chitietsanpham", new ChiTietSanPham());
-        return "add";
+        return "./view/CTSP/add";
     }
 
     @PostMapping("/add")
