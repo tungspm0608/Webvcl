@@ -46,6 +46,9 @@ public class ChiTietSanPhamController {
         return "edit";
     }
 
+
+
+
     @PostMapping("/edit/{id}")
     @Transactional
     public String edit(@PathVariable int id, @ModelAttribute ChiTietSanPham chiTietSanPham) {
