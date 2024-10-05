@@ -1,4 +1,8 @@
 package com.example.webvcl.webvcl.Repository;
 
-public interface ChiTietSanPhamRepo {
+import com.example.webvcl.webvcl.Entity.ChiTietSanPham;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ChiTietSanPhamRepo extends JpaRepository<ChiTietSanPham, Integer> {
+
 }
