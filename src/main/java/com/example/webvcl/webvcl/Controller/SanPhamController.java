@@ -3,97 +3,81 @@ package com.example.webvcl.webvcl.Controller;
 import com.example.webvcl.webvcl.Entity.SanPham;
 import com.example.webvcl.webvcl.Repository.SanPhamRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
-@RequestMapping("sanpham")
+@RequestMapping("/sanpham")
 public class SanPhamController {
+
     @Autowired
     private SanPhamRepo sanPhamRepository;
 
-    @GetMapping("hienthi")
-    public String getSanPham(Model model) {
+    // Hiển thị danh sách sản phẩm
+    @GetMapping
+    public String getAllSanPham(Model model) {
         List<SanPham> sanPhamList = sanPhamRepository.findAll();
         model.addAttribute("sanPhamList", sanPhamList);
-        return "index"; // Chuyển hướng đến index.jsp
+        return "webapp/WEB-INF/view/sanpham/index"; // Đường dẫn đến file index.jsp
     }
 
-    // Thêm sản phẩm
-    @PostMapping("/add")
-    public String addSanPham(@RequestParam String ma,
-                             @RequestParam String ten,
-                             @RequestParam String thongtin,
-                             @RequestParam double gia,
-                             @RequestParam int trangthai,
-                             @RequestParam int soluongdaban,
-                             @RequestParam(required = false) String anh) {
-        SanPham sanPham = new SanPham();
-        sanPham.setMa(ma);
-        sanPham.setTen(ten);
-        sanPham.setThongtin(thongtin);
-        sanPham.setGia(gia);
-        sanPham.setTrangthai(trangthai);
-        sanPham.setSoluongdaban(soluongdaban);
-        sanPham.setAnh(anh);
-
-        sanPhamRepository.save(sanPham);
-        return "redirect:/sanpham"; // Chuyển hướng về danh sách sản phẩm
+    // Hiển thị thêm sản phẩm
+    @GetMapping("/add")
+    public String showAddForm(Model model) {
+        model.addAttribute("sanPham", new SanPham());
+        return "webapp/WEB-INF/view/sanpham/add"; // Đường dẫn đến file add.jsp
     }
 
-    // Lấy tất cả sản phẩm
-    @GetMapping
-    public List<SanPham> getAllSanPham() {
-        return sanPhamRepository.findAll();
+    // Hiển thị form chỉnh sửa sản phẩm
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable int id, Model model) {
+        Optional<SanPham> sanPhamOptional = sanPhamRepository.findById(id);
+        if (sanPhamOptional.isPresent()) {
+            model.addAttribute("sanPham", sanPhamOptional.get());
+            return "webapp/WEB-INF/view/sanpham/edit"; // Đường dẫn đến file edit.jsp
+        } else {
+            return "redirect:/sanpham"; // Nếu không tìm thấy sản phẩm, chuyển hướng về danh sách
+        }
     }
 
     // Cập nhật sản phẩm
-    @GetMapping("/sanpham/sua/{id}")
-    public String editSanPham(@PathVariable("id") int id, Model model) {
-        SanPham sanPham = sanPhamRepository.findById(id).orElse(null);
-        model.addAttribute("sanPham", sanPham);
-        return "edit"; // Trả về view edit.jsp
-    }
-    @PostMapping("/sanpham/capnhat")
-    public String updateSanPham(@RequestParam int id,
-                                @RequestParam String ma,
-                                @RequestParam String ten,
-                                @RequestParam String thongtin,
-                                @RequestParam double gia,
-                                @RequestParam int trangthai,
-                                @RequestParam int soluongdaban,
-                                @RequestParam(required = false) String anh) {
-        SanPham sanPham = new SanPham();
-        sanPham.setId(id);
-        sanPham.setMa(ma);
-        sanPham.setTen(ten);
-        sanPham.setThongtin(thongtin);
-        sanPham.setGia(gia);
-        sanPham.setTrangthai(trangthai);
-        sanPham.setSoluongdaban(soluongdaban);
-        sanPham.setAnh(anh);
+    @PostMapping("/update/{id}")
+    public String updateSanPham(@PathVariable int id, @ModelAttribute SanPham sanPhamDetails) {
+        Optional<SanPham> sanPhamOptional = sanPhamRepository.findById(id);
 
-        sanPhamRepository.save(sanPham);
-        return "redirect:/sanpham"; // Chuyển hướng về danh sách sản phẩm
+        if (sanPhamOptional.isPresent()) {
+            SanPham sanPham = sanPhamOptional.get();
+            sanPham.setMa(sanPhamDetails.getMa());
+            sanPham.setTen(sanPhamDetails.getTen());
+            sanPham.setThongtin(sanPhamDetails.getThongtin());
+            sanPham.setGia(sanPhamDetails.getGia());
+            sanPham.setTrangthai(sanPhamDetails.getTrangthai());
+            sanPham.setSoluongdaban(sanPhamDetails.getSoluongdaban());
+            sanPham.setAnh(sanPhamDetails.getAnh());
+
+            sanPhamRepository.save(sanPham);
+            return "redirect:/sanpham"; // Chuyển hướng về danh sách sản phẩm
+        } else {
+            return "redirect:/sanpham"; // Nếu không tìm thấy sản phẩm, chuyển hướng về danh sách
+        }
     }
 
     // Xóa sản phẩm
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSanPham(@PathVariable int id) {
+    @GetMapping("/delete/{id}")
+    public String deleteSanPham(@PathVariable int id) {
         sanPhamRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return "redirect:/sanpham"; // Chuyển hướng về danh sách sản phẩm
     }
+
+    // Tìm kiếm sản phẩm theo loại
+//    @GetMapping("/timkiem/{idLoai}")
+//    public String timKiemTheoLoai(@PathVariable int idLoai, Model model) {
+//        List<SanPham> sanPhamList = sanPhamRepository.findByLoaiId(idLoai);
+//        model.addAttribute("sanPhamList", sanPhamList);
+//        return "webapp/WEB-INF/view/sanpham/index"; // Trả về danh sách sản phẩm tìm kiếm
+//    }
 }
-
-
