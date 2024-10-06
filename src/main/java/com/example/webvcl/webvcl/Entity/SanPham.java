@@ -47,7 +47,7 @@ public class SanPham {
     private String anh;
 
 //    // Nhiều SanPham thuộc về một Loai
-//    @ManyToOne
-//    @JoinColumn(name = "idLoai") // Tên cột foreign key trong bảng SanPham
-//    private Loai loai;
+    @ManyToOne
+    @JoinColumn(name = "idLoai") // Tên cột foreign key trong bảng SanPham
+    private Loai loai;
 }

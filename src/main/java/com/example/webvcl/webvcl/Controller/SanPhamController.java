@@ -74,10 +74,10 @@ public class SanPhamController {
     }
 
     // Tìm kiếm sản phẩm theo loại
-//    @GetMapping("/timkiem/{idLoai}")
-//    public String timKiemTheoLoai(@PathVariable int idLoai, Model model) {
-//        List<SanPham> sanPhamList = sanPhamRepository.findByLoaiId(idLoai);
-//        model.addAttribute("sanPhamList", sanPhamList);
-//        return "webapp/WEB-INF/view/sanpham/index"; // Trả về danh sách sản phẩm tìm kiếm
-//    }
+    @GetMapping("/timkiem/{idLoai}")
+    public String timKiemTheoLoai(@PathVariable int idLoai, Model model) {
+        List<SanPham> sanPhamList = sanPhamRepository.findByLoaiId(idLoai);
+        model.addAttribute("sanPhamList", sanPhamList);
+        return "webapp/WEB-INF/view/sanpham/index"; // Trả về danh sách sản phẩm tìm kiếm
+    }
 }
