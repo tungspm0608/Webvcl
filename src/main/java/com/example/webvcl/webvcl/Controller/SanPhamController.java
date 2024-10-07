@@ -1,5 +1,6 @@
 package com.example.webvcl.webvcl.Controller;
 
+
 import com.example.webvcl.webvcl.Entity.SanPham;
 import com.example.webvcl.webvcl.Repository.SanPhamRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,76 +9,59 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Controller
-@RequestMapping("/sanpham")
+@RequestMapping("/hnh-shop")
 public class SanPhamController {
 
     @Autowired
-    private SanPhamRepo sanPhamRepository;
+    private SanPhamRepo spRepo;
 
     // Hiển thị danh sách sản phẩm
-    @GetMapping
-    public String getAllSanPham(Model model) {
-        List<SanPham> sanPhamList = sanPhamRepository.findAll();
-        model.addAttribute("sanPhamList", sanPhamList);
-        return "webapp/WEB-INF/view/sanpham/index"; // Đường dẫn đến file index.jsp
+    @GetMapping("/hien-thi")
+    public String hienThiSanPham(Model model) {
+        List<SanPham> spList = spRepo.findAll();
+        model.addAttribute("data", spList);
+        return "san_pham/index";  // Trả về view "index.jsp" hiển thị danh sách sản phẩm
     }
 
-    // Hiển thị thêm sản phẩm
-    @GetMapping("/add")
-    public String showAddForm(Model model) {
-        model.addAttribute("sanPham", new SanPham());
-        return "webapp/WEB-INF/view/sanpham/add"; // Đường dẫn đến file add.jsp
+    // Hiển thị form thêm sản phẩm
+    @GetMapping("/create")
+    public String createForm(Model model) {
+        model.addAttribute("data", new SanPham());  // Tạo một đối tượng trống cho form
+        return "san_pham/add";  // Trả về view "add.jsp" để thêm sản phẩm
+    }
+
+    // Xử lý khi người dùng submit form thêm sản phẩm
+    @PostMapping("/store")
+    public String storeSanPham(@ModelAttribute("data") SanPham sanPham) {
+        spRepo.save(sanPham);  // Lưu sản phẩm vào cơ sở dữ liệu
+        return "redirect:/hnh-shop/hien-thi";  // Chuyển hướng về trang hiển thị sản phẩm
     }
 
     // Hiển thị form chỉnh sửa sản phẩm
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable int id, Model model) {
-        Optional<SanPham> sanPhamOptional = sanPhamRepository.findById(id);
-        if (sanPhamOptional.isPresent()) {
-            model.addAttribute("sanPham", sanPhamOptional.get());
-            return "webapp/WEB-INF/view/sanpham/edit"; // Đường dẫn đến file edit.jsp
-        } else {
-            return "redirect:/sanpham"; // Nếu không tìm thấy sản phẩm, chuyển hướng về danh sách
+    public String editForm(@PathVariable("id") Integer id, Model model) {
+        SanPham sanPham = spRepo.findById(id).orElse(null);
+        if (sanPham != null) {
+            model.addAttribute("data", sanPham);  // Đưa sản phẩm cần chỉnh sửa vào form
+            return "san_pham/edit";  // Trả về view "edit.jsp"
         }
+        return "redirect:/hnh-shop/hien-thi";  // Nếu không tìm thấy sản phẩm, quay lại danh sách
     }
 
-    // Cập nhật sản phẩm
-    @PostMapping("/update/{id}")
-    public String updateSanPham(@PathVariable int id, @ModelAttribute SanPham sanPhamDetails) {
-        Optional<SanPham> sanPhamOptional = sanPhamRepository.findById(id);
-
-        if (sanPhamOptional.isPresent()) {
-            SanPham sanPham = sanPhamOptional.get();
-            sanPham.setMa(sanPhamDetails.getMa());
-            sanPham.setTen(sanPhamDetails.getTen());
-            sanPham.setThongtin(sanPhamDetails.getThongtin());
-            sanPham.setGia(sanPhamDetails.getGia());
-            sanPham.setTrangthai(sanPhamDetails.getTrangthai());
-            sanPham.setSoluongdaban(sanPhamDetails.getSoluongdaban());
-            sanPham.setAnh(sanPhamDetails.getAnh());
-
-            sanPhamRepository.save(sanPham);
-            return "redirect:/sanpham"; // Chuyển hướng về danh sách sản phẩm
-        } else {
-            return "redirect:/sanpham"; // Nếu không tìm thấy sản phẩm, chuyển hướng về danh sách
-        }
+    // Xử lý chỉnh sửa sản phẩm
+    @PostMapping("/edit/{id}")
+    public String updateSanPham(@PathVariable("id") Integer id, @ModelAttribute("data") SanPham sanPham) {
+        sanPham.setId(id);  // Cập nhật ID để đảm bảo đúng sản phẩm
+        spRepo.save(sanPham);  // Cập nhật thông tin sản phẩm vào cơ sở dữ liệu
+        return "redirect:/hnh-shop/hien-thi";  // Quay lại danh sách sản phẩm sau khi cập nhật
     }
 
     // Xóa sản phẩm
     @GetMapping("/delete/{id}")
-    public String deleteSanPham(@PathVariable int id) {
-        sanPhamRepository.deleteById(id);
-        return "redirect:/sanpham"; // Chuyển hướng về danh sách sản phẩm
-    }
-
-    // Tìm kiếm sản phẩm theo loại
-    @GetMapping("/timkiem/{idLoai}")
-    public String timKiemTheoLoai(@PathVariable int idLoai, Model model) {
-        List<SanPham> sanPhamList = sanPhamRepository.findByLoaiId(idLoai);
-        model.addAttribute("sanPhamList", sanPhamList);
-        return "webapp/WEB-INF/view/sanpham/index"; // Trả về danh sách sản phẩm tìm kiếm
+    public String deleteSanPham(@PathVariable("id") Integer id) {
+        spRepo.deleteById(id);  // Xóa sản phẩm khỏi cơ sở dữ liệu
+        return "redirect:/hnh-shop/hien-thi";  // Quay lại danh sách sản phẩm sau khi xóa
     }
 }

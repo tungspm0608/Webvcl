@@ -13,41 +13,28 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @Entity
+@Table(name = "HinhAnh")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "SanPham")
-public class SanPham {
+public class HinhAnh {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
-    @Column(name = "id")
+    @Column(name="id")
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idloai")
-    private Loai loai;
+    @JoinColumn(name = "idspct")
+    private ChiTietSanPham chiTietSanPham;
 
-    @Column(name = "ma")
-    private String ma;
+    @Column(name="trangthai")
+    private String trangThai;
 
-    @Column(name = "ten")
+    @Column(name="ten")
     private String ten;
 
-    @Column(name = "thongtin")
-    private String thongTin;
-
-    @Column(name = "gia")
-    private Double gia;
-
-    @Column(name = "trangthai")
-    private Integer trangThai;
-
-    @Column(name = "soluongdaban")
-    private Integer soLuongDB;
-
-    @Column(name = "anh")
-    private String anh;
 }

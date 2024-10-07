@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/chitietsanpham")
+@RequestMapping("hnh-shop")
 public class ChiTietSanPhamController {
 
     @PersistenceContext
